@@ -1,4 +1,3 @@
-
 import { NoteModel } from "../models/Note";
 import { IResolvers } from "graphql-tools";
 import { Datetime } from "../lib/datetime";
