@@ -24,24 +24,27 @@ async function init() {
     const db = await database.init();
 
     
+    
     const context = async ({ req, connection }: any) => {
     const authHeader = req?.headers?.authorization || connection?.authorization || '';
     let user = null;
 
-    if (authHeader.startsWith('Bearer ')) {
+    // Solo intentar verificar si el header empieza con "Bearer "
+    if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
-        try {
+        if (token) {
+            try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_clave_secreta');
             user = decoded;
         } catch (error) {
             console.error('Token inválido:', error);
         }
-    } else if (authHeader) {
-        console.warn('Formato de token inválido. Se esperaba "Bearer <token>"');
+        }
     }
 
     return { db, user };
 };
+
 
 
     const server = new ApolloServer({
