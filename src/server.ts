@@ -25,25 +25,28 @@ async function init() {
 
     
     
+    
+    
     const context = async ({ req, connection }: any) => {
     const authHeader = req?.headers?.authorization || connection?.authorization || '';
     let user = null;
 
-    // Solo intentar verificar si el header empieza con "Bearer "
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         if (token) {
             try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_clave_secreta');
             user = decoded;
-        } catch (error) {
+            } catch (error) {
             console.error('Token inválido:', error);
-        }
+            }
         }
     }
 
     return { db, user };
 };
+
+
 
 
 
