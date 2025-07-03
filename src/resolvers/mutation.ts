@@ -48,7 +48,7 @@ const mutation: IResolvers = {
 
             const newNote = new NoteModel({
                 content,
-                createdBy: user.id,
+                createdBy: user.id || user.id || user.email,
                 createdAt: new Date().toISOString()
             });
 
