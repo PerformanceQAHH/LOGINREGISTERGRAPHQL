@@ -7,43 +7,53 @@ import { createServer } from 'http';
 import environments from './config/environments';
 import Database from './config/database';
 import expressPlayground from 'graphql-playground-middleware-express';
+import jwt from 'jsonwebtoken';
 
 if (process.env.NODE_ENV !== 'production') {
     const envs = environments;
-    // console.log(envs);
+    // Puedes usar envs aquí si lo necesitas
 }
 
 async function init() {
     const app = express();
 
     app.use('*', cors());
-
     app.use(compression());
 
     const database = new Database();
     const db = await database.init();
 
-    const context: any = async({req,connection}: any) => {
-        const token = req ? req.headers.authorization : connection.authorization;
-        return { db, token };
+    const context = async ({ req, connection }: any) => {
+        const token = req ? req.headers.authorization : connection?.authorization;
+        let user = null;
+
+        if (token) {
+            try {
+                const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET || 'default_secret');
+                user = decoded;
+            } catch (error) {
+            console.error("Token inválido:", error);
+        }
+        }
+
+        return { db, user };
     };
+
     const server = new ApolloServer({
-        schema,
-        context,
-        introspection: true
+    schema,
+    context,
+        introspection: true,
     });
 
+    await server.start();
     server.applyMiddleware({ app });
 
-    app.use('/', expressPlayground({
-        endpoint: '/graphql'
-    }));
-    
+ app.get('/', expressPlayground({ endpoint: '/graphql' }));
+
     const PORT = process.env.PORT || 5300;
     const httpServer = createServer(app);
-    httpServer.listen(
-        { port: PORT },
-        () => console.log(`Sistema de Autenticación JWT API GraphQL http://localhost:${PORT}/graphql`)
+    httpServer.listen({ port: PORT }, () =>
+        console.log(`🚀 API GraphQL corriendo en http://localhost:${PORT}/graphql`)
     );
 }
 

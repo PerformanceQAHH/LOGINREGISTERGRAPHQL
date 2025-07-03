@@ -39,3 +39,20 @@ type ResultToken {
     message: String!
     token: String
 }
+
+type ResultNote {
+    status: Boolean!
+    message: String!
+    note: Note
+}
+
+type Note {
+    id: ID!
+    content: String!
+    createdAt: String!
+    createdBy: User!
+}
+
+extend type Mutation {
+    createNote(content: String!): ResultNote!
+}
