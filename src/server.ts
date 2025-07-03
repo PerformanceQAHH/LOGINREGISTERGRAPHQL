@@ -29,7 +29,7 @@ async function init() {
 
         if (token) {
             try {
-                const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET || 'default_secret');
+                const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET || 'tu_clave_secreta');
                 user = decoded;
             } catch (error) {
             console.error("Token inválido:", error);
